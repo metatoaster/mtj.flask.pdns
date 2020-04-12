@@ -1,0 +1,10 @@
+*.egg
+*.egg-info
+*.eggs/
+*.mo
+*.pyc
+*.swp
+.coverage
+.env*
+build/
+dist/
