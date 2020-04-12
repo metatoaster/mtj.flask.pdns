@@ -37,7 +37,9 @@ def update_record(domain_id, record_type, name, content):
 
 @mtj_pdns.route('/<int:domain_id>/A/<name>', methods=['POST'])
 def update_a(domain_id, name):
-    content = request.form.get('ip', request.remote_addr)
+    content = request.form.get(
+        'ip', request.headers.get(
+            'X-Forwarded-For', request.remote_addr))
     try:
         socket.inet_pton(socket.AF_INET, content)
     except socket.error:
@@ -47,7 +49,9 @@ def update_a(domain_id, name):
 
 @mtj_pdns.route('/<int:domain_id>/AAAA/<name>', methods=['POST'])
 def update_aaaa(domain_id, name):
-    content = request.form.get('ip', request.remote_addr)
+    content = request.form.get(
+        'ip', request.headers.get(
+            'X-Forwarded-For', request.remote_addr))
     try:
         socket.inet_pton(socket.AF_INET6, content)
     except socket.error:
