@@ -1,5 +1,6 @@
 import os
 import socket
+import logging
 
 from sqlalchemy import create_engine
 from sqlalchemy.sql import table, column, select, update
@@ -7,6 +8,7 @@ from sqlalchemy.exc import OperationalError
 from flask import Blueprint, Response, request, abort
 
 
+logger = logging.getLogger(__name__)
 mtj_pdns = Blueprint('mtj_pdns', __name__)
 
 records = table(
@@ -25,6 +27,7 @@ def update_record(domain_id, record_type, name, content):
             (records.c.name == name)
         ).values(content=content))
     except OperationalError:
+        logger.exception('DB Failure')
         return Response('DB Failure', status=400)
 
     result = engine.execute(select([records.c.content]).where(
