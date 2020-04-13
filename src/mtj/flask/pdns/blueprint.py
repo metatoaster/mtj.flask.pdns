@@ -4,7 +4,7 @@ import socket
 from sqlalchemy import create_engine
 from sqlalchemy.sql import table, column, select, update
 from sqlalchemy.exc import OperationalError
-from flask import Blueprint, Response, request
+from flask import Blueprint, Response, request, abort
 
 
 mtj_pdns = Blueprint('mtj_pdns', __name__)
@@ -57,3 +57,14 @@ def update_aaaa(domain_id, name):
     except socket.error:
         return Response('Invalid AAAA Record: %s' % content, status=400)
     return update_record(domain_id, 'AAAA', name, content)
+
+
+@mtj_pdns.before_request
+def auth():
+    token = os.environ.get('MTJ_PDNS_TOKEN', None)
+    if not token:
+        # no authentication used
+        return
+    if request.headers.get('Authorization') == 'Bearer %s' % token:
+        return
+    abort(403)
